@@ -122,6 +122,12 @@ public class UIController : MonoBehaviour
         }
 
         multiplierText.text = "";
+
+        if(!PlayerPrefs.HasKey("mode"))
+        {
+            theStackSpawner.SpawnLevelMarker();
+            PlayerPrefs.SetString("mode", "level");
+        }
     }
 
     private void Update()

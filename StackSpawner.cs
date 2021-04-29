@@ -269,6 +269,8 @@ public class StackSpawner : MonoBehaviour
         GameObject stack = stackPool.GetPooledObject();
         lastSpawnedStack = stack;
         stack.transform.position = new Vector3(currentPlatformCenter.x, transform.position.y, currentPlatformCenter.z);
+
+        stack.GetComponent<StackController>().col = ShiftColor();
         stack.SetActive(true);
         stack.GetComponent<StackController>().shouldMove = false;
         stackCount++;
