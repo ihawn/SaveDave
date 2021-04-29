@@ -43,10 +43,10 @@ public class StackSpawner : MonoBehaviour
 
     public GameObject[] levelMarkers;
 
-    public float timeBetweenBonusStacks, bonusProbability, startVisibleDistance;
-    public int bonusStackCount, bonusSpawnHeightMultiplier;
+    public float timeBetweenBonusStacks, bonusProbabilityStory, bonusProbabilityEndless, startVisibleDistance;
+    public int bonusStackCountLevels, bonusStackCountEndless, bonusSpawnHeightMultiplierStory, bonusSpawnHeightMultiplierEndeless, multiplier, maxMultiplier;
     public bool bonusStacks, wasPerfect;
-    public GameObject bonusIndicator;
+    public GameObject bonusIndicator, bonusText;
 
 
     // Start is called before the first frame update
@@ -167,14 +167,29 @@ public class StackSpawner : MonoBehaviour
             Vector3 lerpedPos = Vector3.Lerp(bonusIndicator.transform.position, currentPlatformCenter, Time.deltaTime * 10f);
             bonusIndicator.transform.position = new Vector3(lerpedPos.x, bonusIndicator.transform.position.y, lerpedPos.z);
             bonusIndicator.transform.localScale = Vector3.Lerp(bonusIndicator.transform.localScale, new Vector3(currentStackWidth*50, currentStackLength*50, stackHeight*200 ), Time.deltaTime * 10f);
+            bonusText.transform.position = bonusIndicator.transform.position + new Vector3(1.2f, 0.3f, 0);
 
-            bonusIndicator.GetComponent<Renderer>().material.SetFloat("_Opacity", 1 - Mathf.Abs(transform.position.y - bonusIndicator.transform.position.y) / startVisibleDistance);
+
+            float alpha = 1 - Mathf.Abs(transform.position.y - bonusIndicator.transform.position.y) / startVisibleDistance;
+            bonusIndicator.GetComponent<Renderer>().material.SetFloat("_Opacity", alpha);
+            bonusText.GetComponent<Renderer>().material.SetFloat("_Opacity", alpha);
 
             if (transform.position.y > bonusIndicator.transform.position.y + stackHeight)
+            {
                 bonusIndicator.SetActive(false);
+                bonusText.SetActive(false);
+            }
         }
     }
 
+
+    void Multiplier()
+    {
+        if(PlayerPrefs.GetString("mode") == "endless")
+        {
+
+        }
+    }
 
 
     IEnumerator SpawnStack()
@@ -185,11 +200,26 @@ public class StackSpawner : MonoBehaviour
         CheckAndMakeStacks();
         transform.position += new Vector3(0, stackHeight, 0);
 
-        if(Random.Range(0f,100f) <= bonusProbability && !bonusIndicator.activeInHierarchy)
+        if(PlayerPrefs.GetString("mode") == "level")
         {
-            bonusIndicator.SetActive(true);
-            bonusIndicator.transform.position = new Vector3(transform.position.x, transform.position.y + Random.Range(bonusSpawnHeightMultiplier/2, bonusSpawnHeightMultiplier) * stackHeight, transform.position.z);
+            if (Random.Range(0f, 100f) <= bonusProbabilityStory && !bonusIndicator.activeInHierarchy)
+            {
+                bonusIndicator.SetActive(true);
+                bonusText.SetActive(true);
+                bonusIndicator.transform.position = new Vector3(transform.position.x, transform.position.y + Random.Range(bonusSpawnHeightMultiplierStory / 2, bonusSpawnHeightMultiplierStory) * stackHeight, transform.position.z);
+            }
         }
+
+        if(PlayerPrefs.GetString("mode") == "endless")
+        {
+            if (Random.Range(0f, 100f) <= bonusProbabilityEndless && !bonusIndicator.activeInHierarchy)
+            {
+                bonusIndicator.SetActive(true);
+                bonusText.SetActive(true);
+                bonusIndicator.transform.position = new Vector3(transform.position.x, transform.position.y + Random.Range(bonusSpawnHeightMultiplierEndeless / 2, bonusSpawnHeightMultiplierEndeless) * stackHeight, transform.position.z);
+            }
+        }
+
     }
 
     IEnumerator SpawnBonusStacks()
@@ -197,31 +227,52 @@ public class StackSpawner : MonoBehaviour
         theAudioManager.generalSounds[1].Play();
         theAudioManager.generalSounds[1].pitch = 2.5f;
         bonusIndicator.SetActive(false);
-        int howMany = Random.Range(bonusStackCount / 2, bonusStackCount);
+        bonusText.SetActive(false);
+        int howMany = 0;
+        
+        if (PlayerPrefs.GetString("mode") == "level")
+            howMany = bonusStackCountLevels;
 
-        for(int i = 0; i < howMany; i++)
+        if (PlayerPrefs.GetString("mode") == "endless")
+            howMany = bonusStackCountEndless;
+
+        for (int i = 0; i < howMany; i++)
         {
             if ((PlayerPrefs.GetString("mode") == "level" && theLevelController.levelRequirements[theLevelController.level] - theScoreManager.score > 2 * stackHeight) || PlayerPrefs.GetString("mode") == "endless" || !PlayerPrefs.HasKey("mode"))
             {
                 if (!PlayerPrefs.HasKey("mode"))
                     PlayerPrefs.SetString("mode", "level");
 
-                GameObject stack = stackPool.GetPooledObject();
-                lastSpawnedStack = stack;
-                stack.transform.position = new Vector3(currentPlatformCenter.x, transform.position.y, currentPlatformCenter.z);
-                stack.SetActive(true);
-                stack.GetComponent<StackController>().shouldMove = false;
-                stackCount++;
-                transform.position += new Vector3(0, stackHeight, 0);
+                if(PlayerPrefs.GetString("mode") == "level")
+                    SpawnBonusStack();
+                if(PlayerPrefs.GetString("mode") == "endless")
+                {
+                    for(int j = 0; j < multiplier + 1; j++)
+                    {
+                        SpawnBonusStack();
+                    }
+                }
             }
 
 
-            yield return new WaitForSeconds(timeBetweenBonusStacks);
+            yield return null;
             
         }
 
         bonusStacks = false;
         StartCoroutine(SpawnStack());
+    }
+
+    void SpawnBonusStack()
+    {
+
+        GameObject stack = stackPool.GetPooledObject();
+        lastSpawnedStack = stack;
+        stack.transform.position = new Vector3(currentPlatformCenter.x, transform.position.y, currentPlatformCenter.z);
+        stack.SetActive(true);
+        stack.GetComponent<StackController>().shouldMove = false;
+        stackCount++;
+        transform.position += new Vector3(0, stackHeight, 0);
     }
 
     void CheckAndMakeStacks()
@@ -309,6 +360,9 @@ public class StackSpawner : MonoBehaviour
 
     public void RestartGame()
     {
+        multiplier = 0;
+        perfectsInARow = 0;
+
         if (PlayerPrefs.GetString("mode") == "endless")
         {
             Destroy(theScoreManager.marker);

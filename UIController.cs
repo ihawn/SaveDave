@@ -45,6 +45,8 @@ public class UIController : MonoBehaviour
     public float feedbackFadeSpeed;
     Coroutine co;
 
+    public Text multiplierText;
+
     private void Awake()
     {
      //  DeleteAndCrash();
@@ -118,6 +120,8 @@ public class UIController : MonoBehaviour
             PlayerPrefs.SetInt("waterfallQual", 2);
             theQualityController.SetWaterfallQuality(2);
         }
+
+        multiplierText.text = "";
     }
 
     private void Update()
@@ -162,6 +166,16 @@ public class UIController : MonoBehaviour
                 feedbackText.color = goodCol;
                 ShowGoodText();
                 break;
+
+            case "bonusGood":
+                feedbackText.color = goodCol;
+                ShowGoodBonusText();
+                break;
+
+            case "bonusBad":
+                feedbackText.color = badCol;
+                ShowBadBonusText();
+                break;
         }
 
         co = StartCoroutine(FadeFeedback());
@@ -180,6 +194,16 @@ public class UIController : MonoBehaviour
     void ShowGoodText()
     {
         feedbackText.text = goodText[Random.Range(0, goodText.Length)];
+    }
+
+    void ShowGoodBonusText()
+    {
+        feedbackText.text = "Bonus!";
+    }
+
+    void ShowBadBonusText()
+    {
+        feedbackText.text = "miss";
     }
 
     public void UnlockAll()

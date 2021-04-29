@@ -68,6 +68,7 @@ public class LevelController : MonoBehaviour
     public GameObject[] strikeZones;
     public float verticalStrikeWindow, lightningVerticalOffset, strikeBloomVal, bloomFadeSpeed, frightLength;
     public GameObject fire;
+    public float maxRainHeight;
 
 
     public float minSnowIntensity, maxSnowIntensity, snowMinHeight, snowMaxHeight;
@@ -137,6 +138,8 @@ public class LevelController : MonoBehaviour
         SetSkyColor(skyCol.Evaluate(0));
         SetEquatorColor(eqCol.Evaluate(0));
         SetGroundColor(grColor.Evaluate(0));
+
+        //PlayerPrefs.DeleteAll();
     }
 
     void SetSnowIntensity(float f)
@@ -502,7 +505,7 @@ public class LevelController : MonoBehaviour
 
     void MaybeSpawnStorm()
     {
-        if(Random.Range(0f,100f) <= levelRainProbabilty[level] && !stormActive)
+        if(Random.Range(0f,100f) <= levelRainProbabilty[level] && !stormActive && theStackSpawner.transform.position.y <= maxRainHeight)
         {
             stormActive = true;
             StartCoroutine(SpawnStorm());

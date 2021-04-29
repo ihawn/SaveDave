@@ -137,10 +137,7 @@ public class StackController : MonoBehaviour
                             {
                                 theStackSpawner.perfectsInARow = 0;
                                 theStackSpawner.stackHeight = theStackSpawner.startingStackHeight;
-                                if (distance > badThreshold * tol)
-                                    theUIController.ShowFeedbackText("bad");
-                                else if (distance > mediumThreshold * tol)
-                                    theUIController.ShowFeedbackText("medium");
+
 
                                 if (transform.position.x <= theStackSpawner.currentPlatformCenter.x)
                                 {
@@ -173,33 +170,14 @@ public class StackController : MonoBehaviour
 
                                 theStackSpawner.currentPlatformCenter = transform.position;
                                 theStackSpawner.currentStackWidth = scale;
+
+                                ShowBadText(distance, tol);
+
                             }
 
                             else
                             {
-                                //snap to position
-                                transform.position = new Vector3(theStackSpawner.currentPlatformCenter.x, transform.position.y, theStackSpawner.currentPlatformCenter.z);
-
-
-                                if (canSpawnPerfectObjects)
-                                {
-                                    theUIController.ShowFeedbackText("good");
-                                    theStackSpawner.wasPerfect = true;  
-
-                                    canSpawnPerfectObjects = false;
-                                    theAuidoManager.PlayPerfectSound();
-                                    StartCoroutine(SpawnPerfectObjects());
-
-                                    if (HitPerfectOnBonus())
-                                        theStackSpawner.bonusStacks = true;
-
-                                    theStackSpawner.perfectsInARow++;
-
-                                    if (theStackSpawner.perfectsInARow > 1 && (theStackSpawner.perfectsInARow - 1) % 7 == 0)
-                                    {
-                                        // theStackSpawner.stackHeight += 0.25f;
-                                    }
-                                }
+                                SnapToPosition();
                             }
                         }
 
@@ -236,10 +214,6 @@ public class StackController : MonoBehaviour
                             {
                                 theStackSpawner.perfectsInARow = 0;
                                 theStackSpawner.stackHeight = theStackSpawner.startingStackHeight;
-                                if (distance > badThreshold * tol)
-                                    theUIController.ShowFeedbackText("bad");
-                                else if (distance > mediumThreshold * tol)
-                                    theUIController.ShowFeedbackText("medium");
 
                                 if (transform.position.z <= theStackSpawner.currentPlatformCenter.z)
                                 {
@@ -274,31 +248,14 @@ public class StackController : MonoBehaviour
 
                                 theStackSpawner.currentPlatformCenter = transform.position;
                                 theStackSpawner.currentStackLength = scale;
+
+                                ShowBadText(distance, tol);
                             }
 
                             else
                             {
                                 //snap to position
-                                transform.position = new Vector3(theStackSpawner.currentPlatformCenter.x, transform.position.y, theStackSpawner.currentPlatformCenter.z);
-
-                                if (canSpawnPerfectObjects)
-                                {
-                                    theUIController.ShowFeedbackText("good");
-                                    theStackSpawner.wasPerfect = true;
-
-                                    if (HitPerfectOnBonus())
-                                        theStackSpawner.bonusStacks = true;
-
-                                    canSpawnPerfectObjects = false;
-                                    theAuidoManager.PlayPerfectSound();
-                                    StartCoroutine(SpawnPerfectObjects());
-                                    theStackSpawner.perfectsInARow++;
-
-                                    if (theStackSpawner.perfectsInARow > 1 && (theStackSpawner.perfectsInARow - 1) % 7 == 0)
-                                    {
-                                        //  theStackSpawner.stackHeight += 0.25f;
-                                    }
-                                }
+                                SnapToPosition();
 
                             }
                         }
@@ -315,17 +272,85 @@ public class StackController : MonoBehaviour
         }
     }
 
-    bool HitPerfectOnBonus()
+    void ShowBadText(float dist, float t)
     {
-        if (Vector3.Distance(theStackSpawner.lastSpawnedStack.transform.position, theStackSpawner.bonusIndicator.transform.position) < 0.001f)
+        theStackSpawner.multiplier = 0;
+
+        theUIController.multiplierText.text = "";
+
+        if (OnBonusStack())
         {
-            return true;
+            theUIController.ShowFeedbackText("bonusBad");
         }
         else
         {
-            return false;
+            if (dist > badThreshold * t)
+                theUIController.ShowFeedbackText("bad");
+            else if (dist > mediumThreshold * t)
+                theUIController.ShowFeedbackText("medium");
         }
+    }
 
+    void SnapToPosition()
+    {
+        transform.position = new Vector3(theStackSpawner.currentPlatformCenter.x, transform.position.y, theStackSpawner.currentPlatformCenter.z);
+
+        if (canSpawnPerfectObjects)
+        {
+
+            theStackSpawner.wasPerfect = true;
+
+            if (HitPerfectOnBonus())
+            {
+                theStackSpawner.bonusStacks = true;
+
+                if (theStackSpawner.multiplier == 0 && PlayerPrefs.GetString("mode") == "endless")
+                    theStackSpawner.multiplier = 1;
+                else if (theStackSpawner.multiplier < theStackSpawner.maxMultiplier && PlayerPrefs.GetString("mode") == "endless")
+                    theStackSpawner.multiplier *= 2;
+
+                theUIController.ShowFeedbackText("bonusGood");
+            }
+            else
+            {
+                theUIController.ShowFeedbackText("good");
+            }
+
+            canSpawnPerfectObjects = false;
+            theAuidoManager.PlayPerfectSound();
+            StartCoroutine(SpawnPerfectObjects());
+            theStackSpawner.perfectsInARow++;
+
+            if (theStackSpawner.perfectsInARow > 7)
+            {
+                theStackSpawner.bonusStacks = true;
+                if (theStackSpawner.multiplier == 0 && PlayerPrefs.GetString("mode") == "endless")
+                    theStackSpawner.multiplier = 1;
+                else if (theStackSpawner.multiplier < theStackSpawner.maxMultiplier && PlayerPrefs.GetString("mode") == "endless")
+                    theStackSpawner.multiplier *= 2;
+            }
+
+            if (theStackSpawner.multiplier > 0)
+                theUIController.multiplierText.text = "X" + theStackSpawner.multiplier;
+            else
+                theUIController.multiplierText.text = "";
+        }
+    }
+
+    bool HitPerfectOnBonus()
+    {
+        if (Vector3.Distance(theStackSpawner.lastSpawnedStack.transform.position, theStackSpawner.bonusIndicator.transform.position) < 0.001f)
+            return true;
+        else
+            return false;
+    }
+
+    bool OnBonusStack()
+    {
+        if (Mathf.Abs(theStackSpawner.lastSpawnedStack.transform.position.y - theStackSpawner.bonusIndicator.transform.position.y) <= 0.001f)
+            return true;
+        else
+            return false;
     }
 
     void SpawnStackEdgeFromX(float spawnOffset, float xScale)
@@ -362,6 +387,8 @@ public class StackController : MonoBehaviour
         theStackSpawner.gameOver = true;
         theLevelController.inGame = false;
         theUIController.wasInDeathMenu = true;
+
+        theUIController.multiplierText.text = "";
     }
 
     IEnumerator SpawnPerfectObjects()
