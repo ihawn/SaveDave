@@ -302,14 +302,18 @@ public class StackController : MonoBehaviour
 
             if (HitPerfectOnBonus())
             {
-                theStackSpawner.bonusStacks = true;
+              //  theStackSpawner.bonusStacks = true;
 
-                if (theStackSpawner.multiplier == 0 && PlayerPrefs.GetString("mode") == "endless")
-                    theStackSpawner.multiplier = 1;
-                else if (theStackSpawner.multiplier < theStackSpawner.maxMultiplier && PlayerPrefs.GetString("mode") == "endless")
-                    theStackSpawner.multiplier *= 2;
-
+                theStackSpawner.currentPlatformCenter = theStackSpawner.transform.position;
+                theStackSpawner.currentStackLength = theStackSpawner.startingStackWidth;
+                theStackSpawner.currentStackWidth = theStackSpawner.startingStackWidth;
+                theStackSpawner.davesAnim.SetBool("TeeterSmall", false);
+                theStackSpawner.davesAnim.SetBool("TeeterLarge", false);
+                theStackSpawner.davesAnim.SetBool("Nervous", false);
                 theUIController.ShowFeedbackText("bonusGood");
+                theAuidoManager.generalSounds[1].Play();
+                theAuidoManager.generalSounds[1].pitch = 2.5f;
+          
             }
             else
             {
