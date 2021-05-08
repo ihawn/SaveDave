@@ -312,6 +312,7 @@ public class StackController : MonoBehaviour
                 theStackSpawner.davesAnim.SetBool("Nervous", false);
                 theUIController.ShowFeedbackText("bonusGood");
                 theAuidoManager.generalSounds[1].Play();
+                theAuidoManager.PlayPerfectBonusAudio();
                 theAuidoManager.generalSounds[1].pitch = 2.5f;
           
             }

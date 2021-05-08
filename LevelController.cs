@@ -74,6 +74,8 @@ public class LevelController : MonoBehaviour
     public float minSnowIntensity, maxSnowIntensity, snowMinHeight, snowMaxHeight;
     public ParticleSystem snow;
     public bool snowing;
+    public WindZone wind;
+    public float minGustDuration, maxGustDuration, minGustMagnitude, maxGustMagnitude
 
 
     // Start is called before the first frame update
@@ -140,6 +142,13 @@ public class LevelController : MonoBehaviour
         SetGroundColor(grColor.Evaluate(0));
 
         //PlayerPrefs.DeleteAll();
+    }
+
+    IEnumerator SetGustIntensity()
+    {
+        float waitTime = Random.Range(minGustDuration, maxGustDuration);
+
+        yield return new WaitForSeconds;
     }
 
     void SetSnowIntensity(float f)

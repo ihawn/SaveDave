@@ -6,7 +6,8 @@ using Cinemachine;
 
 public class StackSpawner : MonoBehaviour
 {
-    float r, g, b;
+    public float r, g, b;
+    public float colParamMinValue;
     public Vector3 colorStep;
     public Color compColor, invColor;
 
@@ -167,7 +168,7 @@ public class StackSpawner : MonoBehaviour
             Vector3 lerpedPos = Vector3.Lerp(bonusIndicator.transform.position, currentPlatformCenter, Time.deltaTime * 10f);
             bonusIndicator.transform.position = new Vector3(lerpedPos.x, bonusIndicator.transform.position.y, lerpedPos.z);
             bonusIndicator.transform.localScale = Vector3.Lerp(bonusIndicator.transform.localScale, new Vector3(currentStackWidth*50, currentStackLength*50, stackHeight*200 ), Time.deltaTime * 10f);
-            bonusText.transform.position = bonusIndicator.transform.position + new Vector3(1.2f, 0.3f, 0);
+            bonusText.transform.position = bonusIndicator.transform.position + new Vector3(1.5f, 0.3f, 0);
 
 
             float alpha = 1 - Mathf.Abs(transform.position.y - bonusIndicator.transform.position.y) / startVisibleDistance;
@@ -460,6 +461,13 @@ public class StackSpawner : MonoBehaviour
         {
             colorStep = new Vector3(-Mathf.Abs(colorStep.x), -Mathf.Abs(colorStep.y), -Mathf.Abs(colorStep.z));
         }
+
+        if (r <= colParamMinValue)
+            r = colParamMinValue;
+        if (g <= colParamMinValue)
+            g = colParamMinValue;
+        if (b <= colParamMinValue)
+            b = colParamMinValue;
 
 
         switch (order)

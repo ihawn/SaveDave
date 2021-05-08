@@ -249,6 +249,7 @@ public class UIController : MonoBehaviour
     {
         PlayerPrefs.SetString("mode", "endless");
         pauseButton.SetActive(true);
+        theLevelController.ship.SetActive(false);
 
         //  debugText.text = "" + PlayerPrefs.GetInt("lastBeatenLevel");
 
@@ -375,6 +376,7 @@ public class UIController : MonoBehaviour
     public void OpenLevels()
     {
         PlayerPrefs.SetString("mode", "level");
+        theLevelController.ship.SetActive(true);
         mainMenu.SetActive(false);
         deathScreen.SetActive(false);
         levelMenu.SetActive(true);
