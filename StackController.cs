@@ -281,6 +281,7 @@ public class StackController : MonoBehaviour
         if (OnBonusStack())
         {
             theUIController.ShowFeedbackText("bonusBad");
+            theAuidoManager.PlayPerfectMissAudio();
         }
         else
         {

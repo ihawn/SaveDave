@@ -74,13 +74,16 @@ public class LevelController : MonoBehaviour
     public float minSnowIntensity, maxSnowIntensity, snowMinHeight, snowMaxHeight;
     public ParticleSystem snow;
     public bool snowing;
-    public WindZone wind;
-    public float minGustDuration, maxGustDuration, minGustMagnitude, maxGustMagnitude
+    public ParticleSystemForceField wind;
+    public float minGustDuration, maxGustDuration, minGustMagnitude, maxGustMagnitude, equalizerMultiplier;
+    float gustSpeed;
 
 
     // Start is called before the first frame update
     void Start()
     {
+        gustSpeed = Random.Range(minGustDuration, maxGustDuration);
+        StartCoroutine(SetGustIntensity());
         snowing = false;
         SetSnowIntensity(0);
         strikeZones = GameObject.FindGameObjectsWithTag("strikeZone");
@@ -148,7 +151,12 @@ public class LevelController : MonoBehaviour
     {
         float waitTime = Random.Range(minGustDuration, maxGustDuration);
 
-        yield return new WaitForSeconds;
+        yield return new WaitForSeconds(waitTime);
+
+        gustSpeed = Random.Range(minGustDuration, maxGustDuration)*theStackSpawner.transform.position.y * equalizerMultiplier;
+        wind.directionX = gustSpeed;
+
+        StartCoroutine(SetGustIntensity());
     }
 
     void SetSnowIntensity(float f)
@@ -287,6 +295,7 @@ public class LevelController : MonoBehaviour
                 SetSnowIntensity(Random.Range(minSnowIntensity, maxSnowIntensity));
                 snowing = true;
             }
+
         }
         //below snow range
         if (snowing && theStackSpawner.topStack.transform.position.y < snowMinHeight)
