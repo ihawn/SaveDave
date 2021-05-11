@@ -29,7 +29,7 @@ public class UIController : MonoBehaviour
 
     public Sprite emptyStar, fullStar, lockSprite;
 
-    public Text postCutsceneText, feedbackText;
+    public Text postCutsceneText, feedbackText, perfectsText;
     public Color badCol, medCol, goodCol;
     public string[] badText, medText, goodText;
 
@@ -55,6 +55,7 @@ public class UIController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        perfectsText.color = goodCol;
 
         co = StartCoroutine(FadeFeedback());
         feedbackText.gameObject.SetActive(false);
@@ -144,6 +145,7 @@ public class UIController : MonoBehaviour
         while(alpha > 0)
         {
             feedbackText.color = new Color(col.r, col.g, col.b, alpha);
+            perfectsText.color = new Color(col.r, col.g, col.b, alpha);
             alpha -= Time.deltaTime*feedbackFadeSpeed;
             yield return null;
         }
@@ -190,21 +192,31 @@ public class UIController : MonoBehaviour
     void ShowBadText()
     {
         feedbackText.text = badText[Random.Range(0, badText.Length)];
+        ShowFeedbackSubtext("");
     }
 
     void ShowMediumText()
     {
         feedbackText.text = medText[Random.Range(0, medText.Length)];
+        ShowFeedbackSubtext("");
     }
 
     void ShowGoodText()
     {
         feedbackText.text = goodText[Random.Range(0, goodText.Length)];
+        if(theStackSpawner.perfectsInARow < 8)
+            ShowFeedbackSubtext((theStackSpawner.perfectsInARow + 1).ToString() + "/8");
+        else
+            ShowFeedbackSubtext("");
     }
 
     void ShowGoodBonusText()
     {
         feedbackText.text = "Bonus!";
+        if (theStackSpawner.perfectsInARow < 8)
+            ShowFeedbackSubtext((theStackSpawner.perfectsInARow + 1).ToString() + "/8");
+        else
+            ShowFeedbackSubtext("");
     }
 
     void ShowBadBonusText()
@@ -215,6 +227,11 @@ public class UIController : MonoBehaviour
     public void UnlockAll()
     {
         PlayerPrefs.SetInt("lastBeatenLevel", theLevelController.levelRequirements.Length - 1);
+    }
+
+    void ShowFeedbackSubtext(string txt)
+    {
+        perfectsText.text = txt;
     }
 
     //dont run this ever unless you are purposly trying to crash system
