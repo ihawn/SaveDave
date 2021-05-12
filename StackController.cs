@@ -6,6 +6,7 @@ using Cinemachine;
 
 public class StackController : MonoBehaviour
 {
+    private ScoreManager theScoreManager;
     private Leaderboards theLeaderboards;
     private StackSpawner theStackSpawner;
     private UIController theUIController;
@@ -30,6 +31,7 @@ public class StackController : MonoBehaviour
     // Start is called before the first frame update
     void OnEnable()
     {
+        theScoreManager = FindObjectOfType<ScoreManager>();
         theLeaderboards = FindObjectOfType<Leaderboards>();
 
         stackOutline.SetActive(true);
@@ -43,6 +45,7 @@ public class StackController : MonoBehaviour
 
         movingForward = true;
         theStackSpawner = FindObjectOfType<StackSpawner>();
+        
 
        
         transform.localScale = new Vector3(theStackSpawner.currentStackWidth, theStackSpawner.stackHeight, theStackSpawner.currentStackLength);
@@ -384,6 +387,8 @@ public class StackController : MonoBehaviour
 
     void GameOver()
     {
+        if (theScoreManager.highScore > 1 && PlayerPrefs.HasKey("username"))
+            theLeaderboards.UploadNewHighScore(PlayerPrefs.GetString("username"), (int)Mathf.Round(theScoreManager.highScore));
 
         theLevelController.vcam.LookAt = theStackSpawner.davesRagdoll.transform;
         theLevelController.davesUmbrella.AddComponent<Rigidbody>();
@@ -399,7 +404,8 @@ public class StackController : MonoBehaviour
 
         theUIController.multiplierText.text = "";
 
-        if (theLeaderboards.username.Length < theLeaderboards.minUsernameLen)
+
+        if (!PlayerPrefs.HasKey("username") && PlayerPrefs.GetString("mode") == "endless")
             theUIController.OpenUsernameSubmission();
     }
 

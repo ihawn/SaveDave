@@ -11,6 +11,7 @@ public class StackSpawner : MonoBehaviour
     public Vector3 colorStep;
     public Color compColor, invColor;
 
+    private Leaderboards theLeaderboard;
     private UIController theUIController;
     private LevelController theLevelController;
     private ScoreManager theScoreManager;
@@ -53,6 +54,8 @@ public class StackSpawner : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        theLeaderboard = FindObjectOfType<Leaderboards>();
+
         bonusStacks = false;
         stackHeight = startingStackHeight;
 
@@ -364,6 +367,7 @@ public class StackSpawner : MonoBehaviour
     public void RestartGame()
     {
         theUIController.CloseUsernameSubmission();
+        theLeaderboard.canLerpText = true;
 
         multiplier = 0;
         perfectsInARow = 0;

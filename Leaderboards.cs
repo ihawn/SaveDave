@@ -9,12 +9,15 @@ using TMPro;
 public class Leaderboards : MonoBehaviour
 {
     public TextMeshProUGUI usernamePromptText;
+    public float textFieldLerpMultiplier, fieldLerpSpeed;
+    public bool canLerpText;
     public string username;
-    public int minUsernameLen;
+    public int minUsernameLen, maxUsernameLen;
     public GameObject usernameField;
     public bool usernameFieldActive;
     public TextMeshProUGUI[] userField, scoreField;
     private UIController theUIController;
+    private ScoreManager theScoreManager;
     private TMP_InputField theInputField;
 
     //View leaderboard database at https://www.dreamlo.com/lb/P5gjtd5i6kOpx-wpb9Mtqwgyqsz12-i02cHh02Uct_xA
@@ -32,15 +35,24 @@ public class Leaderboards : MonoBehaviour
 
     private void Awake()
     {
+        username = "";
 
+        theScoreManager = FindObjectOfType<ScoreManager>();
+
+        if (theScoreManager.highScore > 1 && PlayerPrefs.HasKey("username"))
+            UploadNewHighScore(PlayerPrefs.GetString("username"), (int)Mathf.Round(theScoreManager.highScore));
         DownloadHighScores();
-        AddNewHighScore("testuser1", 50);
+
+        if (PlayerPrefs.HasKey("username"))
+            username = PlayerPrefs.GetString("username");
     }
 
     private void Start()
     {
+        canLerpText = true;
         theInputField = usernameField.GetComponent<TMP_InputField>();
-        username = "";
+        theInputField.characterLimit = maxUsernameLen;
+       // username = "";
         theUIController = FindObjectOfType<UIController>();
 
         theInputField.onEndEdit.AddListener(delegate { OnUserFieldSubmission(); });
@@ -52,10 +64,27 @@ public class Leaderboards : MonoBehaviour
     {
         if(theInputField.isFocused)
         {
-            print("in focus");
+            if(canLerpText)
+            {
+                canLerpText = false;
+                StartCoroutine(LerpText());
+                theUIController.deathScreen.SetActive(false);
+            }
         }
     }
 
+    IEnumerator LerpText()
+    {
+        Vector3 lerpPos = theInputField.transform.position + new Vector3(0f, Screen.height * textFieldLerpMultiplier, 0f);
+
+
+        while(Vector3.Distance(theInputField.transform.position, lerpPos) >= 0.001f)
+        {
+            theInputField.transform.position = Vector3.Lerp(theInputField.transform.position, lerpPos, fieldLerpSpeed * Time.deltaTime);
+
+            yield return null;
+        }
+    }
 
     private void OnEnable()
     {
@@ -74,17 +103,16 @@ public class Leaderboards : MonoBehaviour
     {
         string userText = GetUsernameInput();
 
-        if (userText != "" && userText != null)
+        if (userText.Length >= minUsernameLen)
         {
-            //usernameField.text = FindObjectOfType<Censor>().CensorText(usernameField.text);
+            userText = FindObjectOfType<Censor>().CensorText(userText);
             usernameFieldActive = false;
 
 
             usernameField.gameObject.SetActive(false);
             string usernameStorage = userText;
-
-            //string usernameStorage = usernameField.text;
-            Truncate(usernameStorage, 17);
+            
+            Truncate(usernameStorage, maxUsernameLen);
 
             usernameStorage = usernameStorage.Replace(" ", "_");
             PlayerPrefs.SetString("username", usernameStorage);
@@ -93,15 +121,17 @@ public class Leaderboards : MonoBehaviour
             int highScore = (int)PlayerPrefs.GetFloat("HighScore");
 
             username = usernameStorage;
+            PlayerPrefs.SetString("username", username);
 
-            // AddNewHighScore(PlayerPrefs.GetString("username"), highScore);
-            // AddNewCompHighScore(PlayerPrefs.GetString("username"), (int)PlayerPrefs.GetFloat("DailyHighScore"));
-            // DownloadHighScores();
+            theUIController.deathScreen.SetActive(true);
+
+            AddNewHighScore(username, (int) Mathf.Round(theScoreManager.highScore));
         }
     }
 
     public void AddNewHighScore(string username, int score)
     {
+        print("Attempting to add new high score");
         StartCoroutine(UploadNewHighScore(username, score));
     }
 
@@ -112,7 +142,10 @@ public class Leaderboards : MonoBehaviour
 
     public void CheckUsernameRequirements()
     {
-       
+        if (GetUsernameInput().Length < minUsernameLen)
+            usernamePromptText.text = "Too short";
+        else
+            usernamePromptText.text = "";
     }
 
 
@@ -167,11 +200,12 @@ public class Leaderboards : MonoBehaviour
             print("Error uploading high score: " + www.error);
         }
 
-
+        DownloadHighScores();
     }
 
     IEnumerator GetHighScores()
     {
+        print("Retrieving high scores");
 
         //receive
         UnityWebRequest www = new UnityWebRequest(webURL + publicCode + "/pipe/");

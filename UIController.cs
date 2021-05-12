@@ -141,7 +141,7 @@ public class UIController : MonoBehaviour
     public void CloseUsernameSubmission()
     {
         inputMenu.SetActive(false);
-        theLeaderboard.OnUserFieldSubmission();
+     //  theLeaderboard.OnUserFieldSubmission();
     }
 
     private void Update()
