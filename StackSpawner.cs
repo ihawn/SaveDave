@@ -363,6 +363,8 @@ public class StackSpawner : MonoBehaviour
 
     public void RestartGame()
     {
+        theUIController.CloseUsernameSubmission();
+
         multiplier = 0;
         perfectsInARow = 0;
 

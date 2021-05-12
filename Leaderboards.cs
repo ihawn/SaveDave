@@ -3,13 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using TMPro;
 
 
-public class HighScores : MonoBehaviour
+public class Leaderboards : MonoBehaviour
 {
+    public TextMeshProUGUI usernamePromptText;
+    public string username;
+    public int minUsernameLen;
+    public GameObject usernameField;
     public bool usernameFieldActive;
-    public InputField usernameField;
-    public GameObject settingsButton, titleImage, buttonContainer, leaderboard, everythingButWonScreen, wonScreen;
+    public TextMeshProUGUI[] userField, scoreField;
+    private UIController theUIController;
+    private TMP_InputField theInputField;
 
     //View leaderboard database at https://www.dreamlo.com/lb/P5gjtd5i6kOpx-wpb9Mtqwgyqsz12-i02cHh02Uct_xA
     //these are the old ones for reference
@@ -23,39 +29,76 @@ public class HighScores : MonoBehaviour
     public Highscore[] compScoreList;
     public Highscore[] winnersList;
 
-    public Text userBox, scoreBox, compUserBox, compScoreBox, timerText, rewardText;
 
+    private void Awake()
+    {
+
+        DownloadHighScores();
+        AddNewHighScore("testuser1", 50);
+    }
 
     private void Start()
     {
+        theInputField = usernameField.GetComponent<TMP_InputField>();
+        username = "";
+        theUIController = FindObjectOfType<UIController>();
 
-
-// usernameField.onEndEdit.AddListener(delegate { OnUserFieldSubmission(); });
+        theInputField.onEndEdit.AddListener(delegate { OnUserFieldSubmission(); });
         // DownloadHighScores();
 
     }
 
+    void Update()
+    {
+        if(theInputField.isFocused)
+        {
+            print("in focus");
+        }
+    }
+
+
     private void OnEnable()
     {
-        if (userBox.text != null)
-        {
-            userBox.text = "Retrieving Users...";
-            scoreBox.text = "Retrieving Scores...";
-            compUserBox.text = "Retrieving Users...";
-            compScoreBox.text = "Retrieving Scores...";
-        }
 
         //   DownloadHighScores();
 
 
     }
 
-    private void Awake()
+    string GetUsernameInput()
     {
-
-        DownloadHighScores();
+        return theInputField.text;
     }
 
+    public void OnUserFieldSubmission()
+    {
+        string userText = GetUsernameInput();
+
+        if (userText != "" && userText != null)
+        {
+            //usernameField.text = FindObjectOfType<Censor>().CensorText(usernameField.text);
+            usernameFieldActive = false;
+
+
+            usernameField.gameObject.SetActive(false);
+            string usernameStorage = userText;
+
+            //string usernameStorage = usernameField.text;
+            Truncate(usernameStorage, 17);
+
+            usernameStorage = usernameStorage.Replace(" ", "_");
+            PlayerPrefs.SetString("username", usernameStorage);
+
+
+            int highScore = (int)PlayerPrefs.GetFloat("HighScore");
+
+            username = usernameStorage;
+
+            // AddNewHighScore(PlayerPrefs.GetString("username"), highScore);
+            // AddNewCompHighScore(PlayerPrefs.GetString("username"), (int)PlayerPrefs.GetFloat("DailyHighScore"));
+            // DownloadHighScores();
+        }
+    }
 
     public void AddNewHighScore(string username, int score)
     {
@@ -65,6 +108,11 @@ public class HighScores : MonoBehaviour
     public void DownloadHighScores()
     {
         StartCoroutine(GetHighScores());
+    }
+
+    public void CheckUsernameRequirements()
+    {
+       
     }
 
 
@@ -86,12 +134,6 @@ public class HighScores : MonoBehaviour
         string[] entries = textStream.Split(new char[] { '\n' }, System.StringSplitOptions.RemoveEmptyEntries);
         highscoresList = new Highscore[entries.Length];
 
-        if (userBox != null)
-        {
-            userBox.text = "";
-            scoreBox.text = "";
-        }
-
 
 
         for (int i = 0; i < entries.Length; i++)
@@ -103,12 +145,7 @@ public class HighScores : MonoBehaviour
 
             int place = i + 1;
 
-            if (userBox != null)
-            {
 
-                userBox.text += place + ") " + highscoresList[i].username + "\n------------------------------------------\n";
-                scoreBox.text += highscoresList[i].score + "\n----------\n";
-            }
 
         }
     }
@@ -135,12 +172,6 @@ public class HighScores : MonoBehaviour
 
     IEnumerator GetHighScores()
     {
-        if (userBox != null)
-        {
-            userBox.text = "Retrieving Users...";
-            scoreBox.text = "Retrieving Scores...";
-        }
-
 
         //receive
         UnityWebRequest www = new UnityWebRequest(webURL + publicCode + "/pipe/");
@@ -151,6 +182,12 @@ public class HighScores : MonoBehaviour
         if (string.IsNullOrEmpty(www.error))
         {
             FormatHighscores(www.downloadHandler.text);
+
+            for(int i = 0; i < userField.Length && i < highscoresList.Length; i++)
+            {
+                userField[i].text = (i + 1).ToString() + ") " + highscoresList[i].username;
+                scoreField[i].text = highscoresList[i].score.ToString();
+            }
         }
 
         else

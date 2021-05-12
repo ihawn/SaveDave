@@ -9,6 +9,7 @@ using UnityEngine.Diagnostics;
 public class UIController : MonoBehaviour
 {
     public Vector3 normalFollowOffset, cutSceneFollowOffset;
+    private Leaderboards theLeaderboard;
 
     public Text debugText;
     public Button[] levelButtons;
@@ -19,7 +20,7 @@ public class UIController : MonoBehaviour
     private QualityController theQualityController;
     public GameObject titleImage, startScreen, gamePlayOverlay;
     public Animator titleImageAnimator;
-    public GameObject levelCompletionScreen, deathScreen, mainMenu, levelMenu, endGameMenu, pauseMenu, pauseButton;
+    public GameObject levelCompletionScreen, deathScreen, mainMenu, levelMenu, endGameMenu, pauseMenu, pauseButton, leaderboards, inputMenu;
     Animator lcAnim;
     public bool wasInDeathMenu;
     public bool winScreenBuffer;
@@ -55,6 +56,7 @@ public class UIController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        theLeaderboard = FindObjectOfType<Leaderboards>();
         perfectsText.color = goodCol;
 
         co = StartCoroutine(FadeFeedback());
@@ -131,10 +133,33 @@ public class UIController : MonoBehaviour
         }
     }
 
+    public void OpenUsernameSubmission()
+    {
+        inputMenu.SetActive(true);
+    }
+
+    public void CloseUsernameSubmission()
+    {
+        inputMenu.SetActive(false);
+        theLeaderboard.OnUserFieldSubmission();
+    }
+
     private void Update()
     {
         fpsCounter.text = "" + 1f / Time.deltaTime;
 
+    }
+
+    public void OpenLeaderboard()
+    {
+        mainMenu.SetActive(false);
+        leaderboards.SetActive(true);
+    }
+
+    public void CloseLeaderboard()
+    {
+        mainMenu.SetActive(true);
+        leaderboards.SetActive(false);
     }
 
     IEnumerator FadeFeedback()
@@ -388,10 +413,12 @@ public class UIController : MonoBehaviour
         wasInDeathMenu = false;
         theStackSpawner.davesAnim.SetBool("Restart", true);
         theStackSpawner.davesAnim.SetBool("StartGame", false);
+        CloseUsernameSubmission();
     }
 
     public void OpenLevels()
     {
+        CloseUsernameSubmission();
         PlayerPrefs.SetString("mode", "level");
         theLevelController.ship.SetActive(true);
         mainMenu.SetActive(false);

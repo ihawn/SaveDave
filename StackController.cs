@@ -6,6 +6,7 @@ using Cinemachine;
 
 public class StackController : MonoBehaviour
 {
+    private Leaderboards theLeaderboards;
     private StackSpawner theStackSpawner;
     private UIController theUIController;
     private AudioManager theAuidoManager;
@@ -29,6 +30,8 @@ public class StackController : MonoBehaviour
     // Start is called before the first frame update
     void OnEnable()
     {
+        theLeaderboards = FindObjectOfType<Leaderboards>();
+
         stackOutline.SetActive(true);
 
         canPlayCrack = true;
@@ -395,7 +398,11 @@ public class StackController : MonoBehaviour
         theUIController.wasInDeathMenu = true;
 
         theUIController.multiplierText.text = "";
+
+        if (theLeaderboards.username.Length < theLeaderboards.minUsernameLen)
+            theUIController.OpenUsernameSubmission();
     }
+
 
     IEnumerator SpawnPerfectObjects()
     {
