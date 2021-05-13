@@ -98,24 +98,30 @@ public class Leaderboards : MonoBehaviour
 
     IEnumerator Blur()
     {
-        while (theLevelController.dof.focalLength < 50)
+        if (theLevelController.dof != null)
         {
-            theLevelController.dof.focalLength.value += Time.deltaTime * blurSpeed;
+            while (theLevelController.dof.focalLength < 50)
+            {
+                theLevelController.dof.focalLength.value += Time.deltaTime * blurSpeed;
 
-            yield return null;
+                yield return null;
+            }
         }
     }
 
     IEnumerator UnBlur()
     {
-        while (theLevelController.dof.focalLength > 1)
+        if (theLevelController.dof != null)
         {
-            theLevelController.dof.focalLength.value -= Time.deltaTime * blurSpeed;
+            while (theLevelController.dof.focalLength > 1)
+            {
+                theLevelController.dof.focalLength.value -= Time.deltaTime * blurSpeed;
 
-            yield return null;
+                yield return null;
+            }
+
+            theLevelController.dof.focalLength.value = 1;
         }
-
-        theLevelController.dof.focalLength.value = 1;
     }
 
     IEnumerator GetRank()

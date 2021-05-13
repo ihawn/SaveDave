@@ -59,6 +59,8 @@ public class UIController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
+
         theLeaderboard = FindObjectOfType<Leaderboards>();
         perfectsText.color = goodCol;
 
@@ -134,6 +136,9 @@ public class UIController : MonoBehaviour
             theStackSpawner.SpawnLevelMarker();
             PlayerPrefs.SetString("mode", "level");
         }
+
+        if (!PlayerPrefs.HasKey("mode"))
+            theStackSpawner.StartCoroutine(theStackSpawner.SpawnLevelMarker());
     }
 
 

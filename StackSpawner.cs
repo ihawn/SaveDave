@@ -103,6 +103,10 @@ public class StackSpawner : MonoBehaviour
         }
 
         levelMarkers = new GameObject[theLevelController.levelRequirements.Length];
+
+        var composer = theLevelController.vcam.GetCinemachineComponent<CinemachineComposer>();
+        composer.m_DeadZoneWidth = 0f;
+        composer.m_DeadZoneHeight = 0f;
     }
 
     // Update is called once per frame
