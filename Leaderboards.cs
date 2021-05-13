@@ -19,6 +19,7 @@ public class Leaderboards : MonoBehaviour
     private UIController theUIController;
     private ScoreManager theScoreManager;
     private TMP_InputField theInputField;
+    public int place;
 
     //View leaderboard database at https://www.dreamlo.com/lb/P5gjtd5i6kOpx-wpb9Mtqwgyqsz12-i02cHh02Uct_xA
     //these are the old ones for reference
@@ -35,6 +36,7 @@ public class Leaderboards : MonoBehaviour
 
     private void Awake()
     {
+        place = 0;
         username = "";
 
         theScoreManager = FindObjectOfType<ScoreManager>();
@@ -69,6 +71,22 @@ public class Leaderboards : MonoBehaviour
                 canLerpText = false;
                 StartCoroutine(LerpText());
                 theUIController.deathScreen.SetActive(false);
+            }
+        }
+    }
+
+    IEnumerator GetRank()
+    {
+        if(highscoresList != null  && username.Length >= minUsernameLen && theScoreManager.highScore >= 1)
+        {
+            for(int i = 0; i < 10; i++)
+            {
+                if(highscoresList[i].username == username)
+                {
+                    place = i + 1;
+                    break;
+                }
+                yield return null;
             }
         }
     }
@@ -229,6 +247,8 @@ public class Leaderboards : MonoBehaviour
             print("Error downloading high score: " + www.error);
             //   scoreBox.text = "Retrieving Scores...";
         }
+
+        StartCoroutine(GetRank());
     }
 
 

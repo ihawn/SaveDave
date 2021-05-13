@@ -30,7 +30,7 @@ public class UIController : MonoBehaviour
 
     public Sprite emptyStar, fullStar, lockSprite;
 
-    public Text postCutsceneText, feedbackText, perfectsText;
+    public Text postCutsceneText, feedbackText, perfectsText, statsText;
     public Color badCol, medCol, goodCol;
     public string[] badText, medText, goodText;
 
@@ -133,6 +133,24 @@ public class UIController : MonoBehaviour
         }
     }
 
+    public void ShowStats(int rank)
+    {
+        if (rank > 0)
+        {
+            string rankText;
+
+            if (rank > 999)
+                rankText = "More than 1000th place";
+            else
+                rankText = rank.ToString() + "th place";
+
+            if (PlayerPrefs.HasKey("username"))
+            {
+                statsText.text = PlayerPrefs.GetString("username") + ": High Score: " + theScoreManager.highScore.ToString() + "\nRank: " + rankText;
+            }
+        }
+    }
+
     public void OpenUsernameSubmission()
     {
         inputMenu.SetActive(true);
@@ -154,6 +172,8 @@ public class UIController : MonoBehaviour
     {
         mainMenu.SetActive(false);
         leaderboards.SetActive(true);
+
+        ShowStats(theLeaderboard.place);
     }
 
     public void CloseLeaderboard()
