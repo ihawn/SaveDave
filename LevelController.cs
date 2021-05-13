@@ -44,6 +44,7 @@ public class LevelController : MonoBehaviour
     public ColorGrading cg;
     public Vignette vig;
     public Bloom bloom;
+    public DepthOfField dof;
 
     public float spaceTransitionBottom, spaceTransitionTop, maxSat, maxCont, cloudHeightMin, cloudHeightMax, heightToAcheiveMinCloudHeight;
 
@@ -98,6 +99,7 @@ public class LevelController : MonoBehaviour
         PostProcessVolume volumeMain = mainCam.GetComponent<PostProcessVolume>();
         volumeMain.profile.TryGetSettings(out vig);
         volumeMain.profile.TryGetSettings(out bloom);
+        volumeMain.profile.TryGetSettings(out dof);
         inCutscene = false;
         theUIController = FindObjectOfType<UIController>();
         theAudioManager = FindObjectOfType<AudioManager>();

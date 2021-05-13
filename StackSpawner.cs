@@ -366,6 +366,7 @@ public class StackSpawner : MonoBehaviour
 
     public void RestartGame()
     {
+        theLeaderboard.canUnBlur = true;
         theUIController.CloseUsernameSubmission();
         theLeaderboard.canLerpText = true;
 

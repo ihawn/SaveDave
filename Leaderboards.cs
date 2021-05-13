@@ -10,7 +10,7 @@ public class Leaderboards : MonoBehaviour
 {
     public TextMeshProUGUI usernamePromptText;
     public float textFieldLerpMultiplier, fieldLerpSpeed;
-    public bool canLerpText;
+    public bool canLerpText, canUnBlur;
     public string username;
     public int minUsernameLen, maxUsernameLen;
     public GameObject usernameField;
@@ -20,6 +20,9 @@ public class Leaderboards : MonoBehaviour
     private ScoreManager theScoreManager;
     private TMP_InputField theInputField;
     public int place;
+    Coroutine blurCo;
+    public float blurSpeed;
+    private LevelController theLevelController;
 
     //View leaderboard database at https://www.dreamlo.com/lb/P5gjtd5i6kOpx-wpb9Mtqwgyqsz12-i02cHh02Uct_xA
     //these are the old ones for reference
@@ -36,6 +39,7 @@ public class Leaderboards : MonoBehaviour
 
     private void Awake()
     {
+        canUnBlur = true;
         place = 0;
         username = "";
 
@@ -51,6 +55,7 @@ public class Leaderboards : MonoBehaviour
 
     private void Start()
     {
+        theLevelController = FindObjectOfType<LevelController>();
         canLerpText = true;
         theInputField = usernameField.GetComponent<TMP_InputField>();
         theInputField.characterLimit = maxUsernameLen;
@@ -71,18 +76,58 @@ public class Leaderboards : MonoBehaviour
                 canLerpText = false;
                 StartCoroutine(LerpText());
                 theUIController.deathScreen.SetActive(false);
+
+                if (blurCo != null)
+                    StopCoroutine(blurCo);
+                blurCo = StartCoroutine(Blur());
+
+            }
+        }
+
+        else
+        {
+            if(canUnBlur)
+            {
+                canUnBlur = false;
+                if (blurCo != null)
+                    StopCoroutine(blurCo);
+                blurCo = StartCoroutine(UnBlur());
             }
         }
     }
 
+    IEnumerator Blur()
+    {
+        while (theLevelController.dof.focalLength < 50)
+        {
+            theLevelController.dof.focalLength.value += Time.deltaTime * blurSpeed;
+
+            yield return null;
+        }
+    }
+
+    IEnumerator UnBlur()
+    {
+        while (theLevelController.dof.focalLength > 1)
+        {
+            theLevelController.dof.focalLength.value -= Time.deltaTime * blurSpeed;
+
+            yield return null;
+        }
+
+        theLevelController.dof.focalLength.value = 1;
+    }
+
     IEnumerator GetRank()
     {
-        if(highscoresList != null  && username.Length >= minUsernameLen && theScoreManager.highScore >= 1)
+        if(username.Length >= minUsernameLen && PlayerPrefs.HasKey("HighScore"))
         {
-            for(int i = 0; i < 10; i++)
+            
+            for (int i = 0; i < 10; i++)
             {
                 if(highscoresList[i].username == username)
                 {
+
                     place = i + 1;
                     break;
                 }
@@ -144,6 +189,8 @@ public class Leaderboards : MonoBehaviour
             theUIController.deathScreen.SetActive(true);
 
             AddNewHighScore(username, (int) Mathf.Round(theScoreManager.highScore));
+
+            canUnBlur = true;
         }
     }
 
@@ -247,6 +294,7 @@ public class Leaderboards : MonoBehaviour
             print("Error downloading high score: " + www.error);
             //   scoreBox.text = "Retrieving Scores...";
         }
+
 
         StartCoroutine(GetRank());
     }

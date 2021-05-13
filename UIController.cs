@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Michsky.UI.ModernUIPack;
 using UnityEngine.Diagnostics;
+using TMPro;
 
 public class UIController : MonoBehaviour
 {
@@ -30,9 +31,10 @@ public class UIController : MonoBehaviour
 
     public Sprite emptyStar, fullStar, lockSprite;
 
-    public Text postCutsceneText, feedbackText, perfectsText, statsText;
+    public Text postCutsceneText, feedbackText, perfectsText;
     public Color badCol, medCol, goodCol;
     public string[] badText, medText, goodText;
+    public TextMeshProUGUI statsText;
 
     public GameObject CutSceneUI;
 
@@ -47,6 +49,7 @@ public class UIController : MonoBehaviour
     Coroutine co;
 
     public Text multiplierText;
+
 
     private void Awake()
     {
@@ -133,6 +136,8 @@ public class UIController : MonoBehaviour
         }
     }
 
+
+
     public void ShowStats(int rank)
     {
         if (rank > 0)
@@ -146,7 +151,7 @@ public class UIController : MonoBehaviour
 
             if (PlayerPrefs.HasKey("username"))
             {
-                statsText.text = PlayerPrefs.GetString("username") + ": High Score: " + theScoreManager.highScore.ToString() + "\nRank: " + rankText;
+                statsText.text = PlayerPrefs.GetString("username") + "\nHigh Score: " + theScoreManager.highScore.ToString() + "\nRank: " + rankText;
             }
         }
     }
