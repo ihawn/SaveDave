@@ -52,14 +52,16 @@ public class UIController : MonoBehaviour
     public Text multiplierText;
 
     public static SliderManager powerupSlider;
+    public Slider sl;
     public SliderManager slide;
     public static bool increasePower;
-    public float increaseAmount, powerupDuration, barScaleSpeed;
+    public float increaseAmount, powerupDuration, barScaleSpeed, colorLerpSpeed;
+    public Color barHitColor, barStartColor;
     public static float barContactScale = 1.15f;
     public Button powerupButton;
     public static Vector3 powerupSliderPosition;
-    public  static bool powerupActive;
-    float powerupTimer;
+    public static bool powerupActive;
+    public float powerupTimer;
 
     private void Awake()
     {
@@ -69,6 +71,7 @@ public class UIController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        sl = slide.GetComponent<Slider>();
         powerupSlider = slide;
 
         powerupActive = false;
@@ -155,6 +158,8 @@ public class UIController : MonoBehaviour
             theStackSpawner.StartCoroutine(theStackSpawner.SpawnLevelMarker());
     }
 
+
+
     void UpdatePowerupSlider()
     {
         if(increasePower)
@@ -178,6 +183,10 @@ public class UIController : MonoBehaviour
         }
 
         powerupSlider.transform.localScale = Vector3.Lerp(powerupSlider.transform.localScale, Vector3.one, barScaleSpeed * Time.deltaTime);
+
+        var colorBlock = sl.colors;
+        colorBlock.disabledColor = Color.Lerp(sl.colors.disabledColor, barStartColor, Time.deltaTime * colorLerpSpeed);
+        sl.colors = colorBlock;
     }
 
     public void OnPowerupPress()

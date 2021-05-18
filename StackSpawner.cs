@@ -50,10 +50,14 @@ public class StackSpawner : MonoBehaviour
     public bool bonusStacks, wasPerfect;
     public GameObject bonusIndicator, bonusText;
 
+    
+
 
     // Start is called before the first frame update
     void Start()
     {
+        
+
         startingPerfectTolerance = perfectTolerance;
 
         theLeaderboard = FindObjectOfType<Leaderboards>();
@@ -191,6 +195,8 @@ public class StackSpawner : MonoBehaviour
             }
         }
     }
+
+
 
 
     void Multiplier()

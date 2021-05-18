@@ -6,17 +6,18 @@ public class AudioManager : MonoBehaviour
 {
     LevelController theLevelController;
     StackSpawner theStackSpawner;
+    UIController theUIController;
 
     public Rigidbody davesRB;
 
     public AudioSource[] perfectSound;
-    public AudioSource crack, cutsceneMusic, scream, thud, levelComplete, daveWhistle, daveThud, rain, lightning, highScore, perfectBonusAudio, bonusMissAudio;
+    public AudioSource crack, cutsceneMusic, scream, thud, levelComplete, daveWhistle, daveThud, rain, lightning, highScore, perfectBonusAudio, bonusMissAudio, powerupAudio;
     public AudioSource[] generalSounds; // 0 = birds, 1 = level whoosh
     public float globalEffectVolume;
     public int perfectSoundIndex;
     public float birdMaxVolume, whooshVolMultiplier, whooshPitchMultiplier, whooshPitchVerticalOffset, whooshPitchHorOffset, mult, maxBirdTweetHeight,
         screamVolume, velocityToScream, levelCompleteVolume, startLowPassHeight, endLowPassHeight, cutoffMult, maxCutoff, minCuttof, lowPassLerpSpeed,
-        lightningVolume, highScoreVolume, perfectBonusAudioVolume, perfectMissVolume;
+        lightningVolume, highScoreVolume, perfectBonusAudioVolume, perfectMissVolume, powerupCollectionVolume;
 
     bool canScream;
 
@@ -25,6 +26,7 @@ public class AudioManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        theUIController = FindObjectOfType<UIController>();
         globalEffectVolume = 1;
         perfectSoundIndex = 0;
 
@@ -46,6 +48,18 @@ public class AudioManager : MonoBehaviour
         }
 
     }
+
+    public void PlayPowerupAudio()
+    {
+        if(!powerupAudio.isPlaying)
+        {
+            powerupAudio.Play();
+            powerupAudio.volume = powerupCollectionVolume * globalEffectVolume;
+            powerupAudio.pitch = 0.5f + theUIController.slide.mainSlider.value * 2.5f;
+        }
+    }
+
+
 
     public void PlayPerfectBonusAudio()
     {

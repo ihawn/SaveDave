@@ -24,30 +24,38 @@ public class StackController : MonoBehaviour
 
     public Color col;
 
-    public float badThreshold, mediumThreshold;
+    public float badThreshold, mediumThreshold, flashSpeed, afterPowerupLightLerpSpeed, emissionStrength;
 
     public bool shouldMove;
 
-    // Start is called before the first frame update
-    void OnEnable()
+    Renderer rend;
+
+    private void Start()
     {
+        rend = GetComponent<Renderer>();
         theScoreManager = FindObjectOfType<ScoreManager>();
         theLeaderboards = FindObjectOfType<Leaderboards>();
 
-        stackOutline.SetActive(true);
 
-        canPlayCrack = true;
-        canSpawnPerfectObjects = true;
-        
+
         theUIController = FindObjectOfType<UIController>();
         theLevelController = FindObjectOfType<LevelController>();
         theAuidoManager = FindObjectOfType<AudioManager>();
 
-        movingForward = true;
-        theStackSpawner = FindObjectOfType<StackSpawner>();
+
         
 
-       
+    }
+
+    // Start is called before the first frame update
+    void OnEnable()
+    {
+        theStackSpawner = FindObjectOfType<StackSpawner>();
+        stackOutline.SetActive(true);
+        movingForward = true;
+        canPlayCrack = true;
+        canSpawnPerfectObjects = true;
+
         transform.localScale = new Vector3(theStackSpawner.currentStackWidth, theStackSpawner.stackHeight, theStackSpawner.currentStackLength);
         
 
@@ -69,9 +77,24 @@ public class StackController : MonoBehaviour
         stackOutline.GetComponent<Renderer>().material.SetColor("_Color", theStackSpawner.invColor);
     }
 
+    void LightFlash()
+    {
+        if (UIController.powerupActive)
+        {
+            rend.material.SetColor("_EmissionColor", Color.white * Mathf.Abs(Mathf.Sin(flashSpeed * theUIController.powerupTimer)) * emissionStrength);
+        }
+
+        else
+        {
+            rend.material.SetColor("_EmissionColor", Color.Lerp(rend.material.GetColor("_EmissionColor"), Color.black, afterPowerupLightLerpSpeed * Time.deltaTime));
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {
+        LightFlash();
+
         if (shouldMove)
         {
 
@@ -79,6 +102,8 @@ public class StackController : MonoBehaviour
             {
                 if (startMoving)
                 {
+                    
+
                     if (comingFromX)
                     {
                         if (transform.position.x >= theStackSpawner.currentPlatformCenter.x + theStackSpawner.stackOffset - theStackSpawner.constantOffset + constWiggleOffset && movingForward)
@@ -108,6 +133,11 @@ public class StackController : MonoBehaviour
                     }
 
                     transform.Translate(moveVector * moveSpeed * Time.deltaTime);
+                }
+
+                else
+                {
+                    rend.material.SetColor("_EmissionColor", Color.Lerp(rend.material.GetColor("_EmissionColor"), Color.black, afterPowerupLightLerpSpeed * Time.deltaTime));
                 }
 
 
