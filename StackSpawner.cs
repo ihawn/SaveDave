@@ -24,8 +24,8 @@ public class StackSpawner : MonoBehaviour
 
     public GameObject restartButton, dave, topStack, lastSpawnedStack, levelMarker;
     public ObjectPooler stackPool, stackEdgePool, perfectObjPool;
-    public float timeBetweenStacks, stackHeight,startingStackHeight, stackOffset, startingStackOffset, 
-        currentStackWidth, currentStackLength, startingStackWidth, perfectTolerance, perfectsInARow,
+    public float timeBetweenStacks, stackHeight, startingStackHeight, stackOffset, startingStackOffset,
+        currentStackWidth, currentStackLength, startingStackWidth, perfectTolerance, startingPerfectTolerance, perfectsInARow,
         constantOffset, widthToTeeterSmall, widthToTeeterLarge, danceTimeMin, 
         danceTimeMax, widthToBeNervous, perfectObjectMultiplier, daveWaitToBoard,
         shipWait, colorMinTolerance, colorMaxTolerance ,spawnLevelMarkerDistance;
@@ -54,6 +54,8 @@ public class StackSpawner : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        startingPerfectTolerance = perfectTolerance;
+
         theLeaderboard = FindObjectOfType<Leaderboards>();
 
         bonusStacks = false;
@@ -104,9 +106,9 @@ public class StackSpawner : MonoBehaviour
 
         levelMarkers = new GameObject[theLevelController.levelRequirements.Length];
 
-        var composer = theLevelController.vcam.GetCinemachineComponent<CinemachineComposer>();
+       /* var composer = theLevelController.vcam.GetCinemachineComponent<CinemachineComposer>();
         composer.m_DeadZoneWidth = 0f;
-        composer.m_DeadZoneHeight = 0f;
+        composer.m_DeadZoneHeight = 0f;*/
     }
 
     // Update is called once per frame
@@ -370,6 +372,9 @@ public class StackSpawner : MonoBehaviour
 
     public void RestartGame()
     {
+        theUIController.ResetPowerup();
+        UIController.increasePower = false;
+
         theLeaderboard.canUnBlur = true;
         theUIController.CloseUsernameSubmission();
         theLeaderboard.canLerpText = true;

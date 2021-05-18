@@ -8,6 +8,7 @@ using UnityEngine.Rendering.PostProcessing;
 public class LevelController : MonoBehaviour
 {
 
+
     public Renderer atmosphereRenderer;
     public SliderManager progressSlider;
 
@@ -78,6 +79,7 @@ public class LevelController : MonoBehaviour
     public ParticleSystemForceField wind;
     public float minGustDuration, maxGustDuration, minGustMagnitude, maxGustMagnitude, equalizerMultiplier;
     float gustSpeed;
+
 
 
     // Start is called before the first frame update
@@ -286,7 +288,7 @@ public class LevelController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        
 
         //in snow range
         if (theStackSpawner.topStack.transform.position.y >= snowMinHeight && theStackSpawner.topStack.transform.position.y <= snowMaxHeight)

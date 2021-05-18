@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using Michsky.UI.ModernUIPack;
 using UnityEngine.Diagnostics;
 using TMPro;
+using Michsky.UI.ModernUIPack;
 
 public class UIController : MonoBehaviour
 {
@@ -50,6 +51,15 @@ public class UIController : MonoBehaviour
 
     public Text multiplierText;
 
+    public static SliderManager powerupSlider;
+    public SliderManager slide;
+    public static bool increasePower;
+    public float increaseAmount, powerupDuration, barScaleSpeed;
+    public static float barContactScale = 1.15f;
+    public Button powerupButton;
+    public static Vector3 powerupSliderPosition;
+    public  static bool powerupActive;
+    float powerupTimer;
 
     private void Awake()
     {
@@ -59,7 +69,11 @@ public class UIController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        powerupSlider = slide;
 
+        powerupActive = false;
+        powerupButton.gameObject.SetActive(false);
+        increasePower = false;
 
         theLeaderboard = FindObjectOfType<Leaderboards>();
         perfectsText.color = goodCol;
@@ -141,7 +155,65 @@ public class UIController : MonoBehaviour
             theStackSpawner.StartCoroutine(theStackSpawner.SpawnLevelMarker());
     }
 
+    void UpdatePowerupSlider()
+    {
+        if(increasePower)
+        {
+            powerupTimer = powerupDuration;
+            powerupSlider.mainSlider.value += increaseAmount;
 
+            if(powerupSlider.mainSlider.value >= 1f)
+            {
+                //waiting to activate powerup
+                powerupButton.gameObject.SetActive(true);
+            }
+
+            increasePower = false;
+        }
+
+        if(powerupActive)
+        {
+            powerupTimer -= Time.deltaTime;
+            powerupSlider.mainSlider.value = powerupTimer / powerupDuration; 
+        }
+
+        powerupSlider.transform.localScale = Vector3.Lerp(powerupSlider.transform.localScale, Vector3.one, barScaleSpeed * Time.deltaTime);
+    }
+
+    public void OnPowerupPress()
+    {
+    //    powerupSlider.mainSlider.value = 0f;
+        powerupButton.gameObject.SetActive(false);
+        ActivatePowerup();
+    }
+
+    public void ActivatePowerup()
+    {
+        powerupActive = true;
+        theStackSpawner.perfectTolerance = 1f;
+
+        StartCoroutine(WaitToDeactivatePowerup());
+    }
+
+    public void DeactivatePowerup()
+    {
+        powerupActive = false;
+        theStackSpawner.perfectTolerance = theStackSpawner.startingPerfectTolerance;
+    }
+
+    IEnumerator WaitToDeactivatePowerup()
+    {
+        yield return new WaitForSeconds(powerupDuration);
+
+        DeactivatePowerup();
+    }
+
+    public void ResetPowerup()
+    {
+        powerupActive = false;
+        theStackSpawner.perfectTolerance = theStackSpawner.startingPerfectTolerance;
+        powerupSlider.mainSlider.value = 0f;
+    }
 
     public void ShowStats(int rank)
     {
@@ -176,6 +248,8 @@ public class UIController : MonoBehaviour
     {
         fpsCounter.text = "" + 1f / Time.deltaTime;
 
+        powerupSliderPosition = Camera.main.ScreenToWorldPoint(powerupSlider.transform.position);
+        UpdatePowerupSlider();
     }
 
     public void OpenLeaderboard()

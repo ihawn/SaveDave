@@ -189,17 +189,22 @@ public class StackController : MonoBehaviour
 
                         else
                         {
-                            if (theStackSpawner.lastSpawnedStack != null)
+                            if (!UIController.powerupActive)
                             {
-                                GameObject s = theStackSpawner.stackEdgePool.GetPooledObject();
-                                s.transform.position = theStackSpawner.lastSpawnedStack.transform.position;
-                                s.transform.localScale = theStackSpawner.lastSpawnedStack.transform.localScale;
-                                s.SetActive(true);
-                                theStackSpawner.lastSpawnedStack.SetActive(false);
+                                if (theStackSpawner.lastSpawnedStack != null)
+                                {
+                                    GameObject s = theStackSpawner.stackEdgePool.GetPooledObject();
+                                    s.transform.position = theStackSpawner.lastSpawnedStack.transform.position;
+                                    s.transform.localScale = theStackSpawner.lastSpawnedStack.transform.localScale;
+                                    s.SetActive(true);
+                                    theStackSpawner.lastSpawnedStack.SetActive(false);
 
 
+                                }
+                                GameOver();
                             }
-                            GameOver();
+                            else
+                                SnapToPosition();
                         }
                     }
 
@@ -268,7 +273,11 @@ public class StackController : MonoBehaviour
 
                         else
                         {
-                            GameOver();
+
+                            if (!UIController.powerupActive)
+                                GameOver();
+                            else
+                                SnapToPosition();
                         }
                     }
 
