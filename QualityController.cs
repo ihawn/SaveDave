@@ -12,7 +12,7 @@ public class QualityController : MonoBehaviour
     private UIController theUIController;
 
     public Vector2[] resolutions;
-
+    public int resolutionCount;
 
     public ParticleSystem[] waterfallSprayParticles, waterfallParticles;
 

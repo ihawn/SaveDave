@@ -56,7 +56,6 @@ public class StackSpawner : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
 
         startingPerfectTolerance = perfectTolerance;
 
@@ -307,9 +306,11 @@ public class StackSpawner : MonoBehaviour
 
     public IEnumerator SpawnLevelMarker()
     {
-        for(int i = 0; i < theLevelController.levelRequirements.Length; i++)
+        LevelController lv = FindObjectOfType<LevelController>();
+
+        for(int i = 0; i < lv.levelRequirements.Length; i++)
         {
-            GameObject marker = Instantiate(levelMarker, new Vector3(0, theLevelController.levelRequirements[i]/2 + 0.25f, 0) + levelMarkerOffset, Quaternion.identity);
+            GameObject marker = Instantiate(levelMarker, new Vector3(0, lv.levelRequirements[i]/2 + 0.25f, 0) + levelMarkerOffset, Quaternion.identity);
             levelMarkers[i] = marker;
             yield return null;
         }

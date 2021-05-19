@@ -73,6 +73,8 @@ public class UIController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+    
+
         tapPrompt.gameObject.SetActive(false);
         canPlayPowerupSound = true;
         sl = slide.GetComponent<Slider>();
@@ -100,6 +102,9 @@ public class UIController : MonoBehaviour
 
         titleImageAnimator = titleImage.GetComponent<Animator>();
 
+
+
+
         titleImageAnimator.SetBool("inGame", false);
 
         CutSceneUI.SetActive(false);
@@ -109,9 +114,9 @@ public class UIController : MonoBehaviour
         //set resolution options
         if (resSelector.itemList.Count == 0)
         {
-            theQualityController.resolutions = new Vector2[6];
+            theQualityController.resolutions = new Vector2[theQualityController.resolutionCount];
 
-            for (int i = 6; i > 0; i--)
+            for (int i = theQualityController.resolutionCount; i > 0; i--)
             {
                 theQualityController.resolutions[i - 1] = new Vector2(3 * Display.main.systemWidth / (i + 2), 3 * Display.main.systemHeight / (i + 2));
                 resSelector.CreateNewItem("" + (int)theQualityController.resolutions[i - 1].x + " X " + (int)theQualityController.resolutions[i - 1].y);
@@ -152,14 +157,15 @@ public class UIController : MonoBehaviour
 
         multiplierText.text = "";
 
-        if(!PlayerPrefs.HasKey("mode"))
+        if (!PlayerPrefs.HasKey("mode"))
+            theStackSpawner.StartCoroutine(theStackSpawner.SpawnLevelMarker());
+
+        if (!PlayerPrefs.HasKey("mode"))
         {
             theStackSpawner.SpawnLevelMarker();
             PlayerPrefs.SetString("mode", "level");
         }
 
-        if (!PlayerPrefs.HasKey("mode"))
-            theStackSpawner.StartCoroutine(theStackSpawner.SpawnLevelMarker());
     }
 
 
