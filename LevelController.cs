@@ -328,7 +328,7 @@ public class LevelController : MonoBehaviour
         SetCloudHeight();
         SetSpaceMood();
         UpdateSky();
-
+        
         //Set progress slider
         float sliderVal = 2*theStackSpawner.davesRagdoll.transform.position.y/ levelRequirements[levelRequirements.Length - 1];
 
@@ -383,6 +383,7 @@ public class LevelController : MonoBehaviour
         if(PlayerPrefs.GetString("mode") == "level" && level < levelRequirements.Length && theScoreManager.score >= levelRequirements[level] && canCelebrate && theUIController.winScreenBuffer)
         {
             //level complete
+            theUIController.DeactivatePowerup();
             theAudioManager.PlayeLevelComplete();
             theStackSpawner.currentStackLength = theStackSpawner.startingStackWidth;
             theStackSpawner.currentStackWidth = theStackSpawner.startingStackWidth;

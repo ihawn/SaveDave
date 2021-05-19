@@ -81,7 +81,7 @@ public class StackController : MonoBehaviour
     {
         if (UIController.powerupActive)
         {
-            rend.material.SetColor("_EmissionColor", Color.white * Mathf.Abs(Mathf.Sin(flashSpeed * theUIController.powerupTimer)) * emissionStrength);
+            rend.material.SetColor("_EmissionColor", Color.white * Mathf.Abs(Mathf.Sin(flashSpeed * 1/(theUIController.powerupTimer + 1f))) * emissionStrength);
         }
 
         else
@@ -370,9 +370,11 @@ public class StackController : MonoBehaviour
             canSpawnPerfectObjects = false;
             theAuidoManager.PlayPerfectSound();
             StartCoroutine(SpawnPerfectObjects());
-            theStackSpawner.perfectsInARow++;
 
-            if (theStackSpawner.perfectsInARow > 7)
+            if(!UIController.powerupActive)
+                theStackSpawner.perfectsInARow++;
+
+            if (theStackSpawner.perfectsInARow > 7 && !UIController.powerupActive)
             {
                 theStackSpawner.bonusStacks = true;
                 if (theStackSpawner.multiplier == 0 && PlayerPrefs.GetString("mode") == "endless")
@@ -426,6 +428,9 @@ public class StackController : MonoBehaviour
 
     void GameOver()
     {
+        theUIController.gamePlayOverlay.SetActive(false);
+        theUIController.powerupButton.gameObject.SetActive(false);
+
         if (theScoreManager.highScore > 1 && PlayerPrefs.HasKey("username"))
             theLeaderboards.UploadNewHighScore(PlayerPrefs.GetString("username"), (int)Mathf.Round(theScoreManager.highScore));
 

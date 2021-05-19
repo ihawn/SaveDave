@@ -62,6 +62,8 @@ public class UIController : MonoBehaviour
     public static Vector3 powerupSliderPosition;
     public static bool powerupActive;
     public float powerupTimer;
+    bool canPlayPowerupSound;
+    public Text tapPrompt;
 
     private void Awake()
     {
@@ -71,6 +73,8 @@ public class UIController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        tapPrompt.gameObject.SetActive(false);
+        canPlayPowerupSound = true;
         sl = slide.GetComponent<Slider>();
         powerupSlider = slide;
 
@@ -171,6 +175,12 @@ public class UIController : MonoBehaviour
             {
                 //waiting to activate powerup
                 powerupButton.gameObject.SetActive(true);
+                if(canPlayPowerupSound)
+                {
+                    canPlayPowerupSound = false;
+                    theAudioManager.PlayBonusFull();
+                }
+                
             }
 
             increasePower = false;
@@ -194,31 +204,56 @@ public class UIController : MonoBehaviour
     //    powerupSlider.mainSlider.value = 0f;
         powerupButton.gameObject.SetActive(false);
         ActivatePowerup();
+        canPlayPowerupSound = true;
     }
 
     public void ActivatePowerup()
     {
+        theStackSpawner.multiplier = 0;
         powerupActive = true;
         theStackSpawner.perfectTolerance = 1f;
-
-        StartCoroutine(WaitToDeactivatePowerup());
+        tapPrompt.gameObject.SetActive(true);
+        tapPrompt.color = goodCol;
+        tapPrompt.text = "Tap!";
+        StartCoroutine(WaitToDeactivatePowerup1());
     }
 
     public void DeactivatePowerup()
     {
+        powerupSlider.mainSlider.value = 0f;
+        tapPrompt.gameObject.SetActive(false);
         powerupActive = false;
         theStackSpawner.perfectTolerance = theStackSpawner.startingPerfectTolerance;
     }
 
-    IEnumerator WaitToDeactivatePowerup()
+    IEnumerator WaitToDeactivatePowerup1()
     {
-        yield return new WaitForSeconds(powerupDuration);
+        yield return new WaitForSeconds(powerupDuration*0.5f);
+        tapPrompt.text = "Careful!";
+        tapPrompt.color = medCol;
+        StartCoroutine(WaitToDeactivatePowerup2());
+    }
+
+    IEnumerator WaitToDeactivatePowerup2()
+    {
+        yield return new WaitForSeconds(powerupDuration * 0.3f);
+        tapPrompt.text = "Stop!";
+        tapPrompt.color = badCol;
+        StartCoroutine(WaitToDeactivatePowerup3());
+
+    }
+
+    IEnumerator WaitToDeactivatePowerup3()
+    {
+        yield return new WaitForSeconds(powerupDuration * 0.2f);
 
         DeactivatePowerup();
     }
 
+
     public void ResetPowerup()
     {
+        canPlayPowerupSound = true;
         powerupActive = false;
         theStackSpawner.perfectTolerance = theStackSpawner.startingPerfectTolerance;
         powerupSlider.mainSlider.value = 0f;
@@ -342,7 +377,7 @@ public class UIController : MonoBehaviour
     void ShowGoodText()
     {
         feedbackText.text = goodText[Random.Range(0, goodText.Length)];
-        if(theStackSpawner.perfectsInARow < 8)
+        if(theStackSpawner.perfectsInARow < 8 && !powerupActive)
             ShowFeedbackSubtext((theStackSpawner.perfectsInARow + 1).ToString() + "/8");
         else
             ShowFeedbackSubtext("");

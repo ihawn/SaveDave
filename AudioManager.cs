@@ -11,13 +11,14 @@ public class AudioManager : MonoBehaviour
     public Rigidbody davesRB;
 
     public AudioSource[] perfectSound;
-    public AudioSource crack, cutsceneMusic, scream, thud, levelComplete, daveWhistle, daveThud, rain, lightning, highScore, perfectBonusAudio, bonusMissAudio, powerupAudio;
+    public AudioSource crack, cutsceneMusic, scream, thud, levelComplete, daveWhistle, daveThud, rain, 
+        lightning, highScore, perfectBonusAudio, bonusMissAudio, powerupAudio, bonusFullAudio;
     public AudioSource[] generalSounds; // 0 = birds, 1 = level whoosh
     public float globalEffectVolume;
     public int perfectSoundIndex;
     public float birdMaxVolume, whooshVolMultiplier, whooshPitchMultiplier, whooshPitchVerticalOffset, whooshPitchHorOffset, mult, maxBirdTweetHeight,
         screamVolume, velocityToScream, levelCompleteVolume, startLowPassHeight, endLowPassHeight, cutoffMult, maxCutoff, minCuttof, lowPassLerpSpeed,
-        lightningVolume, highScoreVolume, perfectBonusAudioVolume, perfectMissVolume, powerupCollectionVolume;
+        lightningVolume, highScoreVolume, perfectBonusAudioVolume, perfectMissVolume, powerupCollectionVolume, bonusFullVolume;
 
     bool canScream;
 
@@ -47,6 +48,15 @@ public class AudioManager : MonoBehaviour
             lowPass[i] = perfectSound[i-5].gameObject.GetComponent<AudioLowPassFilter>();
         }
 
+    }
+
+    public void PlayBonusFull()
+    {
+        if (!bonusFullAudio.isPlaying)
+        {
+            bonusFullAudio.Play();
+            bonusFullAudio.volume = bonusFullVolume * globalEffectVolume;
+        }
     }
 
     public void PlayPowerupAudio()

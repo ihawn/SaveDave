@@ -378,6 +378,7 @@ public class StackSpawner : MonoBehaviour
 
     public void RestartGame()
     {
+        theUIController.gamePlayOverlay.SetActive(true);
         theUIController.ResetPowerup();
         UIController.increasePower = false;
 
