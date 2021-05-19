@@ -220,7 +220,7 @@ public class UIController : MonoBehaviour
 
     public void DeactivatePowerup()
     {
-        powerupSlider.mainSlider.value = 0f;
+      //  powerupSlider.mainSlider.value = 0f;
         tapPrompt.gameObject.SetActive(false);
         powerupActive = false;
         theStackSpawner.perfectTolerance = theStackSpawner.startingPerfectTolerance;
