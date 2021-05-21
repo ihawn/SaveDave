@@ -220,7 +220,7 @@ public class UIController : MonoBehaviour
         theStackSpawner.perfectTolerance = 1f;
         tapPrompt.gameObject.SetActive(true);
         tapPrompt.color = goodCol;
-        tapPrompt.text = "Tap!";
+        tapPrompt.text = "Tap Fast!";
         StartCoroutine(WaitToDeactivatePowerup1());
     }
 
@@ -337,32 +337,40 @@ public class UIController : MonoBehaviour
         feedbackText.gameObject.SetActive(true);
         StopCoroutine(co);
 
-        switch(whichOne)
+        if (!powerupActive)
         {
-            case "bad":
-                feedbackText.color = badCol;
-                ShowBadText();
-                break;
+            switch (whichOne)
+            {
+                case "bad":
+                    feedbackText.color = badCol;
+                    ShowBadText();
+                    break;
 
-            case "medium":
-                feedbackText.color = medCol;
-                ShowMediumText();
-                break;
+                case "medium":
+                    feedbackText.color = medCol;
+                    ShowMediumText();
+                    break;
 
-            case "good":
-                feedbackText.color = goodCol;
-                ShowGoodText();
-                break;
+                case "good":
+                    feedbackText.color = goodCol;
+                    ShowGoodText();
+                    break;
 
-            case "bonusGood":
-                feedbackText.color = goodCol;
-                ShowGoodBonusText();
-                break;
+                case "bonusGood":
+                    feedbackText.color = goodCol;
+                    ShowGoodBonusText();
+                    break;
 
-            case "bonusBad":
-                feedbackText.color = badCol;
-                ShowBadBonusText();
-                break;
+                case "bonusBad":
+                    feedbackText.color = badCol;
+                    ShowBadBonusText();
+                    break;
+            }
+        }
+        else
+        {
+            ShowFeedbackSubtext("");
+            feedbackText.text = "";
         }
 
         co = StartCoroutine(FadeFeedback());

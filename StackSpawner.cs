@@ -215,23 +215,26 @@ public class StackSpawner : MonoBehaviour
         CheckAndMakeStacks();
         transform.position += new Vector3(0, stackHeight, 0);
 
-        if(PlayerPrefs.GetString("mode") == "level")
+        if (!UIController.powerupActive)
         {
-            if (Random.Range(0f, 100f) <= bonusProbabilityStory && !bonusIndicator.activeInHierarchy)
+            if (PlayerPrefs.GetString("mode") == "level")
             {
-                bonusIndicator.SetActive(true);
-                bonusText.SetActive(true);
-                bonusIndicator.transform.position = new Vector3(transform.position.x, transform.position.y + Random.Range(bonusSpawnHeightMultiplierStory / 2, bonusSpawnHeightMultiplierStory) * stackHeight, transform.position.z);
+                if (Random.Range(0f, 100f) <= bonusProbabilityStory && !bonusIndicator.activeInHierarchy)
+                {
+                    bonusIndicator.SetActive(true);
+                    bonusText.SetActive(true);
+                    bonusIndicator.transform.position = new Vector3(transform.position.x, transform.position.y + Random.Range(bonusSpawnHeightMultiplierStory / 2, bonusSpawnHeightMultiplierStory) * stackHeight, transform.position.z);
+                }
             }
-        }
 
-        if(PlayerPrefs.GetString("mode") == "endless")
-        {
-            if (Random.Range(0f, 100f) <= bonusProbabilityEndless && !bonusIndicator.activeInHierarchy)
+            if (PlayerPrefs.GetString("mode") == "endless")
             {
-                bonusIndicator.SetActive(true);
-                bonusText.SetActive(true);
-                bonusIndicator.transform.position = new Vector3(transform.position.x, transform.position.y + Random.Range(bonusSpawnHeightMultiplierEndeless / 2, bonusSpawnHeightMultiplierEndeless) * stackHeight, transform.position.z);
+                if (Random.Range(0f, 100f) <= bonusProbabilityEndless && !bonusIndicator.activeInHierarchy)
+                {
+                    bonusIndicator.SetActive(true);
+                    bonusText.SetActive(true);
+                    bonusIndicator.transform.position = new Vector3(transform.position.x, transform.position.y + Random.Range(bonusSpawnHeightMultiplierEndeless / 2, bonusSpawnHeightMultiplierEndeless) * stackHeight, transform.position.z);
+                }
             }
         }
 
