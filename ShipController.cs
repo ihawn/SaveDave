@@ -25,5 +25,8 @@ public class ShipController : MonoBehaviour
         {
             transform.Translate(speed * Time.deltaTime * new Vector3(0, 0, 1));
         }
+
+        if (transform.position.magnitude >= 2000f)
+            gameObject.SetActive(false);
     }
 }

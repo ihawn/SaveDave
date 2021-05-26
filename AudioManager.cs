@@ -18,7 +18,7 @@ public class AudioManager : MonoBehaviour
     public int perfectSoundIndex;
     public float birdMaxVolume, whooshVolMultiplier, whooshPitchMultiplier, whooshPitchVerticalOffset, whooshPitchHorOffset, mult, maxBirdTweetHeight,
         screamVolume, velocityToScream, levelCompleteVolume, startLowPassHeight, endLowPassHeight, cutoffMult, maxCutoff, minCuttof, lowPassLerpSpeed,
-        lightningVolume, highScoreVolume, perfectBonusAudioVolume, perfectMissVolume, powerupCollectionVolume, bonusFullVolume;
+        lightningVolume, highScoreVolume, perfectBonusAudioVolume, perfectMissVolume, powerupCollectionVolume, bonusFullVolume, perfectSoundVolume;
 
     bool canScream;
 
@@ -175,7 +175,7 @@ public class AudioManager : MonoBehaviour
             perfectSound[perfectSoundIndex].Stop();
 
         perfectSound[perfectSoundIndex].Play();
-        perfectSound[perfectSoundIndex].volume = globalEffectVolume;
+        perfectSound[perfectSoundIndex].volume = perfectSoundVolume * globalEffectVolume;
         perfectSoundIndex++;
     }
 
