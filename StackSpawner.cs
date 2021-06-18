@@ -6,6 +6,9 @@ using Cinemachine;
 
 public class StackSpawner : MonoBehaviour
 {
+
+    public GameObject daveHips;
+
     public float r, g, b;
     public float colParamMinValue;
     public Vector3 colorStep;
@@ -107,7 +110,6 @@ public class StackSpawner : MonoBehaviour
             davesAnim.SetBool("ShowCutscene", false);
         }
 
-        levelMarkers = new GameObject[theLevelController.levelRequirements.Length];
 
        /* var composer = theLevelController.vcam.GetCinemachineComponent<CinemachineComposer>();
         composer.m_DeadZoneWidth = 0f;

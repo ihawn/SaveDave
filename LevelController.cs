@@ -80,6 +80,7 @@ public class LevelController : MonoBehaviour
     public float minGustDuration, maxGustDuration, minGustMagnitude, maxGustMagnitude, equalizerMultiplier;
     float gustSpeed;
 
+    public float spaceMusicHeight;
 
 
     // Start is called before the first frame update
@@ -288,7 +289,7 @@ public class LevelController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        UpdateSpaceMusicVolume();
 
         //in snow range
         if (theStackSpawner.topStack.transform.position.y >= snowMinHeight && theStackSpawner.topStack.transform.position.y <= snowMaxHeight)
@@ -378,11 +379,34 @@ public class LevelController : MonoBehaviour
         theUIController.winScreenBuffer = true;
     }
 
+    void UpdateSpaceMusicVolume()
+    {
+        if(theStackSpawner.transform.position.y >= spaceMusicHeight && theAudioManager.spaceMusic.volume == 0f)
+        {
+            StartCoroutine(PlaySpaceMusic());
+        }
+        else if(theStackSpawner.transform.position.y < spaceMusicHeight)
+        {
+            theAudioManager.spaceMusic.volume = 0f;
+        }
+    }
+
+    IEnumerator PlaySpaceMusic()
+    {
+        while(theAudioManager.spaceMusic.volume < theAudioManager.maxSpaceMusicVolume && theStackSpawner.transform.position.y >= spaceMusicHeight)
+        {
+            theAudioManager.spaceMusic.volume += theAudioManager.spaceMusicFadeSpeed * Time.deltaTime;
+            yield return null;
+        }
+    }
+
+
     void CheckForLevelCompletion()
     {
         if(PlayerPrefs.GetString("mode") == "level" && level < levelRequirements.Length && theScoreManager.score >= levelRequirements[level] && canCelebrate && theUIController.winScreenBuffer)
         {
             //level complete
+            theUIController.powerupButton.gameObject.SetActive(false);
             theUIController.DeactivatePowerup();
             theAudioManager.PlayeLevelComplete();
             theStackSpawner.currentStackLength = theStackSpawner.startingStackWidth;
@@ -445,6 +469,7 @@ public class LevelController : MonoBehaviour
             theStackSpawner.davesAnim.SetBool("TeeterLarge", false);
             theStackSpawner.davesAnim.SetInteger("DanceSelector", 0);
             theStackSpawner.MakeStack(theStackSpawner.stackHeight);
+
 
             level++;
             inGame = true;

@@ -65,6 +65,12 @@ public class UIController : MonoBehaviour
     bool canPlayPowerupSound;
     public Text tapPrompt;
 
+    public SwitchManager volumeSwitch;
+    public TextMeshProUGUI volumeText;
+
+    public GameObject helmet;
+    public float helmetHeight;
+
     private void Awake()
     {
      //  DeleteAndCrash();
@@ -73,6 +79,18 @@ public class UIController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if(PlayerPrefs.GetInt("sound") == 1 || !PlayerPrefs.HasKey("sound"))
+        {
+            AudioListener.volume = 1f;
+            volumeSwitch.isOn = true;
+            volumeText.text = "Volume On";
+        }
+        else
+        {
+            AudioListener.volume = 0f;
+            volumeSwitch.isOn = false;
+            volumeText.text = "Volume Off";
+        }
     
 
         tapPrompt.gameObject.SetActive(false);
@@ -157,18 +175,32 @@ public class UIController : MonoBehaviour
 
         multiplierText.text = "";
 
-        if (!PlayerPrefs.HasKey("mode"))
-            theStackSpawner.StartCoroutine(theStackSpawner.SpawnLevelMarker());
+
+        theStackSpawner.levelMarkers = new GameObject[theLevelController.levelRequirements.Length];
 
         if (!PlayerPrefs.HasKey("mode"))
         {
-            theStackSpawner.SpawnLevelMarker();
+            theStackSpawner.StartCoroutine(theStackSpawner.SpawnLevelMarker());
             PlayerPrefs.SetString("mode", "level");
         }
+        else
+            theStackSpawner.StartCoroutine(theStackSpawner.SpawnLevelMarker());
 
     }
 
+    public void DisableSounds()
+    {
+        AudioListener.volume = 0f;
+        PlayerPrefs.SetInt("sound", 0);
+        volumeText.text = "Volume Off";
+    }
 
+    public void EnableSounds()
+    {
+        AudioListener.volume = 1f;
+        PlayerPrefs.SetInt("sound", 1);
+        volumeText.text = "Volume On";
+    }
 
     void UpdatePowerupSlider()
     {
@@ -177,22 +209,23 @@ public class UIController : MonoBehaviour
             powerupTimer = powerupDuration;
             powerupSlider.mainSlider.value += increaseAmount;
 
-            if(powerupSlider.mainSlider.value >= 1f)
-            {
-                //waiting to activate powerup
-                powerupButton.gameObject.SetActive(true);
-                if(canPlayPowerupSound)
-                {
-                    canPlayPowerupSound = false;
-                    theAudioManager.PlayBonusFull();
-                }
-                
-            }
 
             increasePower = false;
         }
 
-        if(powerupActive)
+        if (powerupSlider.mainSlider.value >= 1f && theLevelController.inGame)
+        {
+            //waiting to activate powerup
+            powerupButton.gameObject.SetActive(true);
+            if (canPlayPowerupSound)
+            {
+                canPlayPowerupSound = false;
+                theAudioManager.PlayBonusFull();
+            }
+
+        }
+
+        if (powerupActive)
         {
             powerupTimer -= Time.deltaTime;
             powerupSlider.mainSlider.value = powerupTimer / powerupDuration; 
@@ -205,6 +238,18 @@ public class UIController : MonoBehaviour
         sl.colors = colorBlock;
     }
 
+    void UpdateHelmet()
+    {
+        if(theStackSpawner.transform.position.y >= helmetHeight && !helmet.activeInHierarchy)
+        {
+            helmet.SetActive(true);
+        }
+        else if(theStackSpawner.transform.position.y < helmetHeight && helmet.activeInHierarchy)
+        {
+            helmet.SetActive(false);
+        }
+    }
+
     public void OnPowerupPress()
     {
     //    powerupSlider.mainSlider.value = 0f;
@@ -215,6 +260,7 @@ public class UIController : MonoBehaviour
 
     public void ActivatePowerup()
     {
+        powerupSlider.mainSlider.value = 0.999f;
         theStackSpawner.multiplier = 0;
         powerupActive = true;
         theStackSpawner.perfectTolerance = 1f;
@@ -297,7 +343,7 @@ public class UIController : MonoBehaviour
     private void Update()
     {
         fpsCounter.text = "" + 1f / Time.deltaTime;
-
+        UpdateHelmet();
         powerupSliderPosition = Camera.main.ScreenToWorldPoint(powerupSlider.transform.position);
         UpdatePowerupSlider();
     }
@@ -564,7 +610,8 @@ public class UIController : MonoBehaviour
     public void OpenMainMenu()
     {
         // titleImageAnimator.SetBool("inGame", true);
-        theStackSpawner.StartCoroutine(theStackSpawner.DestroyLevelMarkers());
+        if(PlayerPrefs.HasKey("mode"))
+            theStackSpawner.StartCoroutine(theStackSpawner.DestroyLevelMarkers());
         endGameMenu.SetActive(false);
         titleImage.SetActive(false);
         HideLevelCompletionScreen();

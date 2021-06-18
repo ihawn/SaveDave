@@ -11,18 +11,21 @@ public class AudioManager : MonoBehaviour
     public Rigidbody davesRB;
 
     public AudioSource[] perfectSound;
-    public AudioSource crack, cutsceneMusic, scream, thud, levelComplete, daveWhistle, daveThud, rain, 
+    public AudioSource crack, cutsceneMusic, scream, thud, levelComplete, daveWhistle, daveThud, rain, spaceMusic, 
         lightning, highScore, perfectBonusAudio, bonusMissAudio, powerupAudio, bonusFullAudio;
     public AudioSource[] generalSounds; // 0 = birds, 1 = level whoosh
     public float globalEffectVolume;
     public int perfectSoundIndex;
     public float birdMaxVolume, whooshVolMultiplier, whooshPitchMultiplier, whooshPitchVerticalOffset, whooshPitchHorOffset, mult, maxBirdTweetHeight,
         screamVolume, velocityToScream, levelCompleteVolume, startLowPassHeight, endLowPassHeight, cutoffMult, maxCutoff, minCuttof, lowPassLerpSpeed,
-        lightningVolume, highScoreVolume, perfectBonusAudioVolume, perfectMissVolume, powerupCollectionVolume, bonusFullVolume, perfectSoundVolume;
+        lightningVolume, highScoreVolume, perfectBonusAudioVolume, perfectMissVolume, powerupCollectionVolume, bonusFullVolume, perfectSoundVolume,
+        maxSpaceMusicVolume;
 
     bool canScream;
 
     AudioLowPassFilter[] lowPass;
+
+    public float spaceMusicFadeSpeed;
 
     // Start is called before the first frame update
     void Start()
@@ -35,17 +38,18 @@ public class AudioManager : MonoBehaviour
         theLevelController = FindObjectOfType<LevelController>();
 
         //initialize lowPass
-        lowPass = new AudioLowPassFilter[perfectSound.Length + 5];
+        lowPass = new AudioLowPassFilter[perfectSound.Length + 6];
 
         lowPass[0] = crack.gameObject.GetComponent<AudioLowPassFilter>();
         lowPass[1] = levelComplete.gameObject.GetComponent<AudioLowPassFilter>();
         lowPass[2] = generalSounds[1].gameObject.GetComponent<AudioLowPassFilter>();
         lowPass[3] = daveWhistle.gameObject.GetComponent<AudioLowPassFilter>();
         lowPass[4] = daveThud.gameObject.GetComponent<AudioLowPassFilter>();
+        lowPass[5] = powerupAudio.gameObject.GetComponent<AudioLowPassFilter>();
 
-        for (int i = 5; i < lowPass.Length; i++)
+        for (int i = 6; i < lowPass.Length; i++)
         {
-            lowPass[i] = perfectSound[i-5].gameObject.GetComponent<AudioLowPassFilter>();
+            lowPass[i] = perfectSound[i-6].gameObject.GetComponent<AudioLowPassFilter>();
         }
 
     }

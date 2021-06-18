@@ -6,6 +6,7 @@ using Cinemachine;
 
 public class StackController : MonoBehaviour
 {
+
     private ScoreManager theScoreManager;
     private Leaderboards theLeaderboards;
     private StackSpawner theStackSpawner;
