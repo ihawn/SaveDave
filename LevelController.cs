@@ -4,6 +4,8 @@ using UnityEngine;
 using Cinemachine;
 using Michsky.UI.ModernUIPack;
 using UnityEngine.Rendering.PostProcessing;
+using GameAnalyticsSDK;
+using GameAnalyticsSDK.Events;
 
 public class LevelController : MonoBehaviour
 {
@@ -82,10 +84,15 @@ public class LevelController : MonoBehaviour
 
     public float spaceMusicHeight;
 
+    CutSceneController csc;
+    public GameObject skipCutsceneButton;
+
 
     // Start is called before the first frame update
     void Start()
     {
+
+
         gustSpeed = Random.Range(minGustDuration, maxGustDuration);
         StartCoroutine(SetGustIntensity());
         snowing = false;
@@ -115,11 +122,14 @@ public class LevelController : MonoBehaviour
             cutScene.transform.localScale = cutsceneSpawnPoint.transform.localScale;
             theUIController.HideStartScreen();
             theAudioManager.StartCoroutine(theAudioManager.FadeInSound(theAudioManager.cutsceneMusic, 1, 1));
+            csc = cutScene.transform.GetChild(0).GetComponent<CutSceneController>();
+            skipCutsceneButton.SetActive(true);
         }
 
         else
         {
             theUIController.ShowStartScreen();
+            skipCutsceneButton.SetActive(false);
         }
 
 
@@ -443,6 +453,12 @@ public class LevelController : MonoBehaviour
             {
                 PlayerPrefs.SetInt("lastBeatenLevel", level + 1);
             }
+
+
+            //Game Analytics progression event
+            int actLevel = level + 1;
+            string l = "" + actLevel;
+            GameAnalytics.NewProgressionEvent(GAProgressionStatus.Complete, l);
            
         }
     }
@@ -732,5 +748,11 @@ public class LevelController : MonoBehaviour
 
             openedUmbrella = false;
         }
+    }
+
+    public void SkipCutscene()
+    {
+        skipCutsceneButton.SetActive(false);
+        csc.EndCutscene();
     }
 }
